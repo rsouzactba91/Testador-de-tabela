@@ -135,4 +135,8 @@ Public Class Form1
         Return valor
     End Function
 
+    Private Sub GerenciaTabelas_Click(sender As Object, e As EventArgs) Handles GerenciaTabelas.Click
+        Dim formGerenciar As New Form2() ' Cria uma instância do Form2
+        formGerenciar.ShowDialog() ' Abre o Form2 como uma janela modal
+    End Sub
 End Class
