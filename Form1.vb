@@ -81,31 +81,30 @@ Public Class Form1
             MessageBox.Show("Por favor, insira horários válidos no formato dd/MM/yyyy HH:mm.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End If
     End Sub
+
     ' Função para calcular o valor da Tabela 1
     Private Function CalcularValorTabela1(totalHoras As Integer, totalMinutos As Integer) As Decimal
         Dim valor As Decimal = 0
 
-        ' Se o tempo total é 0 e os minutos são iguais ou inferiores a 15
+        ' Até 15 minutos é grátis
         If totalHoras = 0 AndAlso totalMinutos <= 15 Then
-            valor = 0 ' Até 15 minutos é grátis
-            ' Se o tempo total é 0 e os minutos estão entre 16 e 30
+            valor = 0
+            ' De 16 a 30 minutos custa R$ 13,00
         ElseIf totalHoras = 0 AndAlso totalMinutos > 15 AndAlso totalMinutos <= 30 Then
-            valor = 13 ' De 16 a 30 minutos custa R$ 13,00
-            ' Se o tempo total é de 31 minutos até 3 horas
-        ElseIf totalHoras = 0 AndAlso totalMinutos > 30 Then
-            valor = 19 ' Custa R$ 19,00
-        ElseIf totalHoras >= 1 And totalHoras < 3 Then
-            valor = 19 ' Custa R$ 19,00
+            valor = 13
+            ' De 31 minutos até 3 horas custa R$ 19,00
+        ElseIf totalHoras < 3 Then
+            valor = 19
             ' Acima de 3 horas
         ElseIf totalHoras >= 3 Then
             valor = 19 ' Cobra o valor de 3 horas
 
             ' Calcula o tempo extra após 3 horas
-            Dim minutosExtras As Integer = ((totalHoras - 3) * 60) + totalMinutos
-            Dim blocosDe15Min As Integer = Math.Ceiling(minutosExtras / 15.0) ' Arredonda corretamente
-
-            ' Adiciona R$ 2,50 por cada bloco de 15 minutos
-            valor += blocosDe15Min * 2.5
+            Dim minutosExtras As Integer = (totalHoras - 3) * 60 + totalMinutos
+            If minutosExtras > 0 Then
+                Dim blocosDe15Min As Integer = Math.Ceiling(minutosExtras / 15.0) ' Arredonda corretamente
+                valor += blocosDe15Min * 2.5 ' Adiciona R$ 2,50 por cada bloco de 15 minutos
+            End If
         End If
 
         Return valor
