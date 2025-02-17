@@ -1,4 +1,5 @@
 ﻿Imports System.Globalization
+Imports System.Reflection.Metadata
 
 Public Class Form1
     ' Construtor do formulário
@@ -8,7 +9,7 @@ Public Class Form1
     End Sub
 
     ' Evento Load do formulário - Configura os MaskedTextBox e carrega a última tabela salva
-    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Public Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         entrada.Mask = "00/00/0000 00:00"
         saida.Mask = "00/00/0000 00:00"
 
@@ -81,35 +82,37 @@ Public Class Form1
             MessageBox.Show("Por favor, insira horários válidos no formato dd/MM/yyyy HH:mm.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End If
     End Sub
-
-    ' Função para calcular o valor da Tabela 1
     Private Function CalcularValorTabela1(totalHoras As Integer, totalMinutos As Integer) As Decimal
         Dim valor As Decimal = 0
+
+        ' Obtém os valores das configurações e converte para Decimal
+        Dim valorAte30Min As Decimal = Convert.ToDecimal(My.Settings.Minutos30, System.Globalization.CultureInfo.InvariantCulture)
+        Dim valorAte3Horas As Decimal = Convert.ToDecimal(My.Settings.UmaHora, System.Globalization.CultureInfo.InvariantCulture)
+        Dim valorExtra As Decimal = Convert.ToDecimal(My.Settings.Fracao, System.Globalization.CultureInfo.InvariantCulture)
 
         ' Até 15 minutos é grátis
         If totalHoras = 0 AndAlso totalMinutos <= 15 Then
             valor = 0
-            ' De 16 a 30 minutos custa R$ 13,00
+            ' De 16 a 30 minutos
         ElseIf totalHoras = 0 AndAlso totalMinutos > 15 AndAlso totalMinutos <= 30 Then
-            valor = 13
-            ' De 31 minutos até 3 horas custa R$ 19,00
+            valor = valorAte30Min
+            ' De 31 minutos até 3 horas
         ElseIf totalHoras < 3 Then
-            valor = 19
+            valor = valorAte3Horas
             ' Acima de 3 horas
         ElseIf totalHoras >= 3 Then
-            valor = 19 ' Cobra o valor de 3 horas
+            valor = valorAte3Horas
 
-            ' Calcula o tempo extra após 3 horas
+            ' Calcula minutos extras
             Dim minutosExtras As Integer = (totalHoras - 3) * 60 + totalMinutos
             If minutosExtras > 0 Then
-                Dim blocosDe15Min As Integer = Math.Ceiling(minutosExtras / 15.0) ' Arredonda corretamente
-                valor += blocosDe15Min * 2.5 ' Adiciona R$ 2,50 por cada bloco de 15 minutos
+                Dim blocosDe15Min As Integer = Math.Ceiling(minutosExtras / 15.0)
+                valor += blocosDe15Min * valorExtra
             End If
         End If
 
         Return valor
     End Function
-
 
     ' Função para calcular o valor da Tabela 2
     Private Function CalcularValorTabela2(totalHoras As Integer, totalMinutos As Integer) As Decimal
@@ -138,5 +141,9 @@ Public Class Form1
     Private Sub GerenciaTabelas_Click(sender As Object, e As EventArgs) Handles GerenciaTabelas.Click
         Dim formGerenciar As New Form2() ' Cria uma instância do Form2
         formGerenciar.ShowDialog() ' Abre o Form2 como uma janela modal
+    End Sub
+
+    Private Sub FontDialog1_Apply(sender As Object, e As EventArgs)
+
     End Sub
 End Class
