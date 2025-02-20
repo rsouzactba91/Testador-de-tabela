@@ -30,6 +30,7 @@ Partial Class Form1
         tabelatxtbox = New TextBox()
         tabela_label = New Label()
         GerenciaTabelas = New Button()
+        testar = New Button()
         SuspendLayout()
         ' 
         ' entrada
@@ -76,7 +77,7 @@ Partial Class Form1
         ' 
         ' Calcular
         ' 
-        Calcular.Location = New Point(102, 131)
+        Calcular.Location = New Point(194, 208)
         Calcular.Name = "Calcular"
         Calcular.Size = New Size(178, 63)
         Calcular.TabIndex = 4
@@ -104,7 +105,7 @@ Partial Class Form1
         ' 
         ' GerenciaTabelas
         ' 
-        GerenciaTabelas.Location = New Point(401, 56)
+        GerenciaTabelas.Location = New Point(407, 13)
         GerenciaTabelas.Margin = New Padding(3, 2, 3, 2)
         GerenciaTabelas.Name = "GerenciaTabelas"
         GerenciaTabelas.Size = New Size(115, 44)
@@ -112,11 +113,21 @@ Partial Class Form1
         GerenciaTabelas.Text = "Gerenciar"
         GerenciaTabelas.UseVisualStyleBackColor = True
         ' 
+        ' testar
+        ' 
+        testar.Location = New Point(407, 76)
+        testar.Name = "testar"
+        testar.Size = New Size(115, 43)
+        testar.TabIndex = 8
+        testar.Text = "Testar registro"
+        testar.UseVisualStyleBackColor = True
+        ' 
         ' Form1
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(534, 302)
+        Controls.Add(testar)
         Controls.Add(GerenciaTabelas)
         Controls.Add(tabelatxtbox)
         Controls.Add(tabela_label)
@@ -140,4 +151,5 @@ Partial Class Form1
     Friend WithEvents tabelatxtbox As TextBox
     Friend WithEvents tabela_label As Label
     Friend WithEvents GerenciaTabelas As Button
+    Friend WithEvents testar As Button
 End Class

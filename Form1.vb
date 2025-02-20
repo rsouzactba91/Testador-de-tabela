@@ -103,7 +103,7 @@ Public Class Form1
             MessageBox.Show("Por favor, insira horários válidos no formato dd/MM/yyyy HH:mm.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End If
     End Sub
-    Private Function CalcularValorTabela1(totalHoras As Integer, totalMinutos As Integer) As Decimal
+    Public Function CalcularValorTabela1(totalHoras As Integer, totalMinutos As Integer) As Decimal
         Dim valor As Decimal = 0
 
         ' Obtém os valores das configurações e usa valores padrão como backup
@@ -174,5 +174,10 @@ Public Class Form1
 
     Private Sub FontDialog1_Apply(sender As Object, e As EventArgs)
 
+    End Sub
+
+    Private Sub testar_Click(sender As Object, e As EventArgs) Handles testar.Click
+        Dim testar As New Form3()
+        testar.ShowDialog()
     End Sub
 End Class
