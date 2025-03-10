@@ -1,4 +1,8 @@
-﻿Imports System.IO
+﻿Imports System.ComponentModel
+Imports System.IO
+Imports IronOcr
+Imports IronOcr.License
+
 
 Public Class Form3
     ' Lista para armazenar os veículos no pátio
@@ -32,28 +36,45 @@ Public Class Form3
 
         File.WriteAllLines(caminhoArquivo, linhas)
     End Sub
-
     ' 🔹 Função para carregar os veículos do arquivo patio.txt
     Private Sub CarregarVeiculos()
-        Dim caminhoArquivo As String = "patio.txt"
+        Try
+            Dim caminhoArquivo As String = "patio.txt"
 
-        If Not File.Exists(caminhoArquivo) Then Return
+            ' Verifica se o arquivo existe
+            If Not File.Exists(caminhoArquivo) Then Return
 
-        Dim linhas As String() = File.ReadAllLines(caminhoArquivo)
-        ListaPatio.Clear()
+            ' Lê todas as linhas do arquivo
+            Dim linhas As String() = File.ReadAllLines(caminhoArquivo)
+            ListaPatio.Clear()  ' Limpa a lista de veículos antes de carregar os novos dados
 
-        For Each linha In linhas
-            Dim dados As String() = linha.Split(";"c)
-            Dim veiculo As New Veiculo With {
+            ' Processa cada linha do arquivo
+            For Each linha In linhas
+                Dim dados As String() = linha.Split(";"c)
+
+                ' Tenta criar um novo veículo a partir dos dados lidos
+                Dim veiculo As New Veiculo With {
                 .Placa = dados(0),
                 .Ticket = dados(1),
                 .HorarioEntrada = DateTime.Parse(dados(2)),
                 .HorarioSaida = If(dados(3) = "", DateTime.MinValue, DateTime.Parse(dados(3))),
                 .ValorAPagar = Decimal.Parse(dados(4))
             }
-            ListaPatio.Add(veiculo)
-        Next
+
+                ' Adiciona o veículo à lista
+                ListaPatio.Add(veiculo)
+            Next
+
+        Catch ex As FormatException
+            ' Caso ocorra um erro de formatação (por exemplo, ao tentar converter a data ou valor)
+            MessageBox.Show("Erro de formato nos dados do arquivo: " & ex.Message, "Erro de Formatação", MessageBoxButtons.OK, MessageBoxIcon.Error)
+
+        Catch ex As Exception
+            ' Captura qualquer outra exceção
+            MessageBox.Show("Erro ao carregar os veículos: " & ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
     End Sub
+
 
     ' 🔹 Registrar entrada automaticamente ao digitar no campo "entrada"
     Private Sub entrada_TextChanged(sender As Object, e As EventArgs) Handles entrada.TextChanged
@@ -175,5 +196,74 @@ Public Class Form3
         formLista.ListaPatio = ListaPatio ' Passa a lista de veículos para o Form4
         formLista.ShowDialog()
     End Sub
+    Private Sub BtnTesseract_Click(sender As Object, e As EventArgs) Handles BtnTesseract.Click
+        Dim openFileDialog As New OpenFileDialog()
+        openFileDialog.Filter = "Imagens (*.jpg;*.jpeg;*.png;*.bmp)|*.jpg;*.jpeg;*.png;*.bmp"
+        openFileDialog.Title = "Selecione uma imagem da placa"
 
+        If openFileDialog.ShowDialog() = DialogResult.OK Then
+            Dim caminhoImagem As String = openFileDialog.FileName
+            Dim placaDetectada As String = LerPlacaOCR(caminhoImagem)
+
+            If Not String.IsNullOrEmpty(placaDetectada) Then
+                MessageBox.Show("Placa detectada: " & placaDetectada, "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                ' Exemplo: preenche o TextBox de entrada
+                entrada.Text = placaDetectada
+            Else
+                MessageBox.Show("Não foi possível reconhecer a placa.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            End If
+        End If
+
+    End Sub
+    Private Function LerPlacaOCR(caminhoImagem As String) As String
+        Try
+            ' Definir a chave de licença do IronOCR
+            IronOcr.License.LicenseKey = "IRONSUITE.RSOUZACTBA.91.HOTMAIL.COM.1978-CA5AC86B6E-APXAPSKOJ2EAARPL-QPI72JNL2HLB-KZHX2HJLZZGO-AHSG7GVQ2PNL-PFMEWKJSJM3T-U77RJPB75YTZ-ALNLQR-TP7TIC3F7COPEA-DEPLOYMENT.TRIAL-GUFNBU.TRIAL.EXPIRES.08.APR.2025"
+
+            ' Criar uma instância do IronTesseract
+            Dim ocr As New IronTesseract()
+
+            ' Utiliza OcrImageInput que já carrega a imagem via construtor
+            Using input As New OcrImageInput(caminhoImagem)
+                ' Melhorar a qualidade da imagem antes do OCR
+                input.DeNoise()
+                input.ToGrayScale()
+
+                ' Ler a placa do veículo utilizando o método recomendado
+                Dim resultado As OcrLicensePlateResult = ocr.ReadLicensePlate(input)
+
+                ' Capturar o texto extraído e formatá-lo
+                Dim textoExtraido As String = resultado.Text.Trim().ToUpper()
+
+                ' Retornar o resultado processado
+                Return textoExtraido
+            End Using
+
+        Catch ex As Exception
+            MessageBox.Show("Erro ao processar OCR: " & ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Return ""
+        End Try
+
+    End Function
+
+
+
+
+    ' Função auxiliar para filtrar a placa (remove caracteres indesejados e formata se tiver 7 caracteres)
+    Private Function FiltrarPlaca(texto As String) As String
+        Dim placaLimpa As String = New String(texto.Where(Function(c) Char.IsLetterOrDigit(c)).ToArray())
+
+        If placaLimpa.Length = 7 Then
+            ' Se o 5º caractere (índice 4) for dígito, assume formato antigo AAA-0000
+            If Char.IsDigit(placaLimpa(4)) Then
+                Return placaLimpa.Substring(0, 3) & "-" & placaLimpa.Substring(3, 4)
+            Else
+                ' Caso contrário, assume formato Mercosul AAA0A00
+                Return placaLimpa
+            End If
+        End If
+
+        Return placaLimpa
+
+    End Function
 End Class

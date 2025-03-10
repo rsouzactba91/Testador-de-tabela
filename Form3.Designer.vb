@@ -28,6 +28,7 @@ Partial Class Form3
         ListadePatio = New Label()
         entrada = New TextBox()
         saida = New TextBox()
+        BtnTesseract = New Button()
         SuspendLayout()
         ' 
         ' Label1
@@ -80,11 +81,21 @@ Partial Class Form3
         saida.Size = New Size(51, 23)
         saida.TabIndex = 7
         ' 
+        ' BtnTesseract
+        ' 
+        BtnTesseract.Location = New Point(111, 126)
+        BtnTesseract.Name = "BtnTesseract"
+        BtnTesseract.Size = New Size(187, 54)
+        BtnTesseract.TabIndex = 8
+        BtnTesseract.Text = "Tesseract"
+        BtnTesseract.UseVisualStyleBackColor = True
+        ' 
         ' Form3
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(329, 214)
+        Controls.Add(BtnTesseract)
         Controls.Add(saida)
         Controls.Add(entrada)
         Controls.Add(ListadePatio)
@@ -103,4 +114,5 @@ Partial Class Form3
     Friend WithEvents ListadePatio As Label
     Friend WithEvents entrada As TextBox
     Friend WithEvents saida As TextBox
+    Friend WithEvents BtnTesseract As Button
 End Class
