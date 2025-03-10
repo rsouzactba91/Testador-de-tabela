@@ -178,6 +178,6 @@ Public Class Form1
 
     Private Sub testar_Click(sender As Object, e As EventArgs) Handles testar.Click
         Dim testar As New Form3()
-        testar.ShowDialog()
+        testar.Show()
     End Sub
 End Class
